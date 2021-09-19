@@ -5,6 +5,7 @@ from django.db import models
 class TestSet(models.Model):
     title = models.CharField(max_length=200)
     visible = models.BooleanField(default=False)
+    questions = models.ManyToManyField('Question')
 
     def __str__(self):
         return self.title
@@ -12,7 +13,7 @@ class TestSet(models.Model):
 
 class Question(models.Model):
     title = models.CharField(max_length=4096)
-    questions = models.ManyToManyField(TestSet)
+    # testset = models.ManyToManyField(TestSet)
 
     def __str__(self):
         return self.title
@@ -35,3 +36,10 @@ class PassedTestSet(models.Model):
 
     def __str__(self):
         return self.testset.title
+
+
+class Answer(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
+    testset = models.ForeignKey(TestSet, on_delete=models.DO_NOTHING)
+    answer = models.ForeignKey(Choice, on_delete=models.DO_NOTHING)
+
