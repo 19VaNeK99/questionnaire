@@ -3,7 +3,7 @@ from .models import Question, TestSet, Choice, PassedTestSet
 
 @admin.register(TestSet)
 class TestSetAdmin(admin.ModelAdmin):
-    raw_id_fields = ('questions',)
+    pass
 
 
 admin.site.register(Question)

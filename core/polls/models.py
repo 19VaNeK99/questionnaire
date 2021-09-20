@@ -5,7 +5,8 @@ from django.db import models
 class TestSet(models.Model):
     title = models.CharField(max_length=200)
     visible = models.BooleanField(default=False)
-    questions = models.ManyToManyField('Question')
+    questions = models.ManyToManyField('Question', blank=True)
+
 
     def __str__(self):
         return self.title
@@ -13,6 +14,7 @@ class TestSet(models.Model):
 
 class Question(models.Model):
     title = models.CharField(max_length=4096)
+    test_set = models.ManyToManyField('TestSet', through=TestSet.questions.through, blank=True)
     # testset = models.ManyToManyField(TestSet)
 
     def __str__(self):
