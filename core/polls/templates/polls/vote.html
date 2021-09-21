@@ -1,4 +1,4 @@
-{% extends "poll/base.html" %}
+{% extends "polls/base.html" %}
 
 {% block title %}Vote{% endblock %}
 
@@ -16,29 +16,23 @@
                         <h2>{{ poll.title }}</h2>
                     </div>
                 </div>
-<!--            -->
-<!--                <div class="row">-->
-<!--                    <div class="col-lg-12">-->
-<!--                        <hr />-->
-<!--            -->
-<!--                        <form method="POST">-->
-<!--                            {% csrf_token %}-->
-<!--                            <div class="form-group">-->
-<!--                                <div class="radio">-->
-<!--                                    <label>-->
-<!--                                        <input type="radio" name="poll" value="option1">-->
-<!--                                        {{ poll.option_one }}-->
-<!--                                    </label> &nbsp;-->
-<!--                                    <label>-->
-<!--                                        <input type="radio" name="poll" value="option2">-->
-<!--                                        {{ poll.option_two }}-->
-<!--                                    </label> &nbsp;-->
-<!--                                    <label>-->
-<!--                                        <input type="radio" name="poll" value="option3">-->
-<!--                                        {{ poll.option_three }}-->
-<!--                                    </label> &nbsp;-->
-<!--                                </div>-->
-<!--                            </div>-->
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <hr />
+
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <div class="radio">
+                                    {% for answer in answers %}
+                                        <label>
+                                            <input type="radio" name="poll" value="option1">
+                                            {{ answer.title }}
+                                        </label> &nbsp;
+                                    {% endfor %}
+                                </div>
+                            </div>
             
                             <hr />
             

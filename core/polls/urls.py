@@ -15,4 +15,5 @@ urlpatterns = [
     path('create/', views.create, name='create'),
     path('results/<poll_id>/', views.results, name='results'),
     path('vote/<poll_id>/', views.vote, name='vote'),
+    path('test_set/<test_set_id>/', views.test_set, name='test_set')
 ]

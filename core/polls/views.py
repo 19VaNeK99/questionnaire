@@ -1,5 +1,5 @@
 from .serializers import QuestionSerializer
-from .models import Question, TestSet, Answer
+from .models import Question, TestSet, Answer, Choice
 from rest_framework import viewsets
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -66,7 +66,7 @@ def results(request, poll_id):
 
 
 def vote(request, poll_id):
-    poll = Answer.objects.get(pk=poll_id)
+    poll = Question.objects.get(pk=poll_id)
 
     if request.method == 'POST':
 
@@ -85,6 +85,18 @@ def vote(request, poll_id):
         return redirect('results', poll.id)
 
     context = {
-        'poll': poll
+        'poll': poll,
+        'answers': Choice.objects.filter(question=poll).all()
     }
     return render(request, 'polls/vote.html', context)
+
+
+def test_set(request, test_set_id):
+    current_test_set = TestSet.objects.get(pk=test_set_id)
+
+    context = {
+        'test_set': current_test_set,
+        'questions': current_test_set.questions.all()
+    }
+    # print(current_test_set.questions.all())
+    return render(request, 'polls/test_set.html', context)

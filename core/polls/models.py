@@ -7,7 +7,6 @@ class TestSet(models.Model):
     visible = models.BooleanField(default=False)
     questions = models.ManyToManyField('Question', blank=True)
 
-
     def __str__(self):
         return self.title
 
