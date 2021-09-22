@@ -32,7 +32,6 @@ class Choice(models.Model):
 class PassedTestSet(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
     testset = models.ForeignKey(TestSet, on_delete=models.DO_NOTHING)
-    result = models.IntegerField()
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -41,6 +40,5 @@ class PassedTestSet(models.Model):
 
 class Answer(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
-    testset = models.ForeignKey(TestSet, on_delete=models.DO_NOTHING)
+    question = models.ForeignKey(PassedTestSet, on_delete=models.DO_NOTHING)
     answer = models.ForeignKey(Choice, on_delete=models.DO_NOTHING)
-

@@ -27,15 +27,15 @@
                                 <div class="radio">
                                     {% for answer in answers %}
                                         <label>
-                                            <input type="radio" name="poll" value="option1">
+                                            <input type="radio" name="poll" value={{ answer.pk }}>
                                             {{ answer.title }}
                                         </label> &nbsp;
                                     {% endfor %}
                                 </div>
                             </div>
-            
+
                             <hr />
-            
+
                             <button type="submit" class="btn btn-info">
                                 Submit
                             </button>

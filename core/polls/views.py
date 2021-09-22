@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 # from .forms import AnswerFormSet
-from .forms import CreatePollForm
+from .forms import CreatePollForm, AnswerPollForm
 
 class GetQuestion(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
@@ -33,10 +33,10 @@ class GetQuestion(viewsets.ModelViewSet):
 
 
 def home(request):
-    polls = TestSet.objects.all()
+    test_sets = TestSet.objects.all()
 
     context = {
-        'polls': polls
+        'testsets': test_sets
     }
     return render(request, 'polls/home.html', context)
 
@@ -65,29 +65,30 @@ def results(request, poll_id):
     return render(request, 'polls/results.html', context)
 
 
-def vote(request, poll_id):
-    poll = Question.objects.get(pk=poll_id)
-
+def vote(request, question_id):
+    poll = Question.objects.get(pk=question_id)
     if request.method == 'POST':
 
         selected_option = request.POST['poll']
-        if selected_option == 'option1':
-            poll.option_one_count += 1
-        elif selected_option == 'option2':
-            poll.option_two_count += 1
-        elif selected_option == 'option3':
-            poll.option_three_count += 1
-        else:
-            return HttpResponse(400, 'Invalid form option')
+        print(selected_option)
+        current_answer = Answer
+        return HttpResponse(400, 'Invalid form option')
+
 
         poll.save()
 
         return redirect('results', poll.id)
 
+    else:
+        form = AnswerPollForm()
+
     context = {
         'poll': poll,
         'answers': Choice.objects.filter(question=poll).all()
     }
+    # context = {
+    #     'form': form
+    # }
     return render(request, 'polls/vote.html', context)
 
 
