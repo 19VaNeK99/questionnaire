@@ -10,17 +10,32 @@
                 <h3 class="panel-title">{{ test_set.title }}</h3>
             </div>
 
-            <ul class="list-group">
-                {% for question in questions %}
-                <li class="list-group-item">
-                    <strong>{{ question.title }}</strong>
-                    <span class="pull-right">
-                        <a href="{% url 'vote' question.id %}" class="btn btn-info btn-xs">Vote</a> &nbsp;
-                        <a href="{% url 'results' question.id %}" class="btn btn-default btn-xs">View Results</a> &nbsp;
-                    </span>
-                </li>
-                {% endfor %}
-            </ul>
+
+
+<!--            <ul class="list-group">-->
+<!--                {% for question in questions %}-->
+<!--                <li class="list-group-item">-->
+<!--                    <strong>{{ question.title }}</strong>-->
+<!--                    <span class="pull-right">-->
+<!--                        <a href="{% url 'vote' question.id %}" class="btn btn-info btn-xs">Vote</a> &nbsp;-->
+<!--                        <a href="{% url 'results' question.id %}" class="btn btn-default btn-xs">View Results</a> &nbsp;-->
+<!--                    </span>-->
+<!--                </li>-->
+<!--                {% endfor %}-->
+<!--            </ul>-->
+            <div class="row">
+                <hr />
+                <div class="col-md-6" align="center">
+                    <a href="{% url 'create_question' test_set.pk %}" class="btn btn-info btn-xs">Create Question</a>
+                    <p></p>
+
+                </div>
+                <div class="col-md-6" align="center">
+                    <a href="{% url 'start_test_set' test_set.pk %}" class="btn btn-info btn-xs">Start</a>
+                    <p></p>
+
+                </div>
+            </div>
 
         </div>
     </div>

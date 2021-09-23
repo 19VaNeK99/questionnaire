@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'polls.apps.PollsConfig',
     'rest_framework',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [

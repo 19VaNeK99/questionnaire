@@ -1,12 +1,20 @@
 from django.forms import ModelForm
-from .models import TestSet, Question
+from .models import TestSet, Question, Choice
 
-class CreatePollForm(ModelForm):
+
+class CreateTestSetForm(ModelForm):
     class Meta:
         model = TestSet
         fields = ['title']
 
-class AnswerPollForm(ModelForm):
+
+class CreateQuestionForm(ModelForm):
     class Meta:
         model = Question
         fields = ['title']
+
+
+class CreateChoiceForm(ModelForm):
+    class Meta:
+        model = Choice
+        fields = ['title', 'is_right']

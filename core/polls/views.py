@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 # from .forms import AnswerFormSet
-from .forms import CreatePollForm, AnswerPollForm
+from .forms import CreateTestSetForm, CreateQuestionForm, CreateChoiceForm
 
 class GetQuestion(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
@@ -41,16 +41,16 @@ def home(request):
     return render(request, 'polls/home.html', context)
 
 
-def create(request):
+def create_test_set(request):
     if request.method == 'POST':
-        form = CreatePollForm(request.POST)
+        form = CreateTestSetForm(request.POST)
 
         if form.is_valid():
             form.save()
 
             return redirect('home')
     else:
-        form = CreatePollForm()
+        form = CreateTestSetForm()
 
     context = {'form': form}
     return render(request, 'polls/create.html', context)
@@ -101,3 +101,18 @@ def test_set(request, test_set_id):
     }
     # print(current_test_set.questions.all())
     return render(request, 'polls/test_set.html', context)
+
+
+def create_question(request, test_set_id):
+    form = CreateQuestionForm()
+    form_choice = CreateChoiceForm()
+    context = {
+        'form': form,
+        'form_choice': form_choice
+    }
+    return render(request, 'polls/create_question.html', context)
+
+
+
+def start_test_set(request, test_set_id):
+    pass

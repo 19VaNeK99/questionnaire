@@ -12,6 +12,8 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
         <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
 
+
+        <script type="text/javascript" src={% static "js/main.js" %}></script>
     </head>
     <body>
         <nav class="navbar navbar-default" role="navigation">
@@ -31,7 +33,7 @@
                 <div class="collapse navbar-collapse navbar-ex1-collapse">
                     <ul class="nav navbar-nav">
                         <li><a href="{% url 'home' %}">Home</a></li>
-                        <li><a href="{% url 'create' %}">Create</a></li>
+                        <li><a href="{% url 'create_test_set' %}">Create</a></li>
                     </ul>
                 </div><!-- /.navbar-collapse -->
             </div>
