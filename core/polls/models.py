@@ -22,7 +22,7 @@ class Question(models.Model):
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.DO_NOTHING)
-    title = models.CharField(max_length=4096)
+    choice = models.CharField(max_length=4096)
     is_right = models.BooleanField(default=False)
 
     def __str__(self):

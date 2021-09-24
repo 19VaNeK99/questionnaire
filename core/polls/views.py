@@ -104,13 +104,26 @@ def test_set(request, test_set_id):
 
 
 def create_question(request, test_set_id):
-    form = CreateQuestionForm()
-    form_choice = CreateChoiceForm()
-    context = {
-        'form': form,
-        'form_choice': form_choice
-    }
-    return render(request, 'polls/create_question.html', context)
+    if request.method == 'POST':
+
+        form = CreateQuestionForm(request.POST)
+        form_choice = CreateChoiceForm(request.POST)
+        if form.is_valid() and form_choice.is_valid():
+            current_test_set = TestSet.objects.get(pk=test_set_id)
+            new_question = Question.objects.create(title=request.POST['title'][0])
+            new_question.test_set.add(current_test_set)
+            new_question.save()
+            return redirect('test_set', test_set_id=test_set_id, permanent=False)
+
+
+    else:
+        form = CreateQuestionForm()
+        form_choice = CreateChoiceForm()
+        context = {
+            'form': form,
+            'form_choice': form_choice
+        }
+        return render(request, 'polls/create_question.html', context)
 
 
 

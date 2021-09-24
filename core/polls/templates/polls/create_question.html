@@ -3,6 +3,17 @@
 
 {% block title %}Create Question{% endblock %}
 
+{% block head %}
+<script>
+    let count_choice = 1;
+    function add_fields() {
+        var d = document.getElementById("content");
+        count_choice += 1;
+        d.innerHTML += '<br/><div class="col-lg-4"><div class="form-group"><label for="option' + count_choice + '">Option ' + count_choice + '</label> {% render_field form_choice.choice class="form-control" %} </div></div>'
+    }
+</script>
+{% endblock %}
+
 {% block main %}
 
 <div class="row">
@@ -24,15 +35,18 @@
                         </div>
                     </div>
 
-                    <input type="button" id="more_fields" onclick="add_fields();" value="Add More" />
 
-       <div id="room_fileds">
-            <div class='label'>Room 1:</div>
-            <div id="content">
-                <span>Width: <input type="text" style="width:48px;" name="width[]" value="" /><small>(ft)</small> X </span>
-                <span>Length: <input type="text" style="width:48px;" name="length[]" value="" /><small>(ft)</small</span>
-            </div>
-        </div>
+                    <input type="button" id="more_fields" onclick="add_fields();" value="Add More" />
+                    <div class="row" id="content">
+                        <div id="room_fileds">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label for="option1">Option 1</label>
+                                    {% render_field form_choice.choice class="form-control" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="row">
                         <hr />
@@ -47,3 +61,4 @@
     </div>
 </div>
 {% endblock %}
+
