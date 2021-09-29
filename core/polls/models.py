@@ -26,7 +26,7 @@ class Choice(models.Model):
     is_right = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.title
+        return self.choice
 
 
 class PassedTestSet(models.Model):

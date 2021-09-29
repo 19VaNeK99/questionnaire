@@ -1,11 +1,11 @@
 from .serializers import QuestionSerializer
 from .models import Question, TestSet, Answer, Choice
 from rest_framework import viewsets
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 # from .forms import AnswerFormSet
-from .forms import CreateTestSetForm, CreateQuestionForm, CreateChoiceForm
-
+from .forms import CreateTestSetForm, CreateQuestionForm, CreateChoiceForm, UserRegistrationForm
+from django.views.generic import View
 class GetQuestion(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
     queryset = Question.objects.all()
@@ -103,19 +103,55 @@ def test_set(request, test_set_id):
     return render(request, 'polls/test_set.html', context)
 
 
+
+
+# class CreateQuestion(View):
+#     def get(self, request):
+#         form = CreateQuestionForm()
+#         form_choice = CreateChoiceForm()
+#         context = {
+#             'form': form,
+#             'form_choice': form_choice
+#         }
+#         return render(self.request, 'polls/create_question.html', context)
+#
+#     def post(self, request):
+#         form = CreateQuestionForm(request.POST)
+#         form_choice = CreateChoiceForm(request.POST)
+#         if form.is_valid() and form_choice.is_valid():
+#             current_test_set = TestSet.objects.get(pk=test_set_id)
+#             new_question = Question.objects.create(title=request.POST['title'][0])
+#             new_question.test_set.add(current_test_set)
+#             new_question.save()
+#             return redirect('test_set', test_set_id=test_set_id, permanent=False)
+
 def create_question(request, test_set_id):
     if request.method == 'POST':
 
         form = CreateQuestionForm(request.POST)
-        form_choice = CreateChoiceForm(request.POST)
-        if form.is_valid() and form_choice.is_valid():
+        #form_choice = CreateChoiceForm(request.POST)
+        if form.is_valid():
             current_test_set = TestSet.objects.get(pk=test_set_id)
-            new_question = Question.objects.create(title=request.POST['title'][0])
+            new_question = Question.objects.create(title=request.POST['title'])
             new_question.test_set.add(current_test_set)
             new_question.save()
-            return redirect('test_set', test_set_id=test_set_id, permanent=False)
+            choices = []
+            for i in request.POST:
+                if "choice" in i:
+                    l = [j for j in request.POST]
+                    is_r = f"is_right{request.POST[i][-1]}"
+                    choices.append({
+                        'choice': request.POST[i],
+                        'question': new_question,
+                        'is_right': True if is_r in l else False
 
+                    })
 
+            for item in choices:
+                new_choice = Choice.objects.create(**item)
+                new_choice.save()
+
+            return HttpResponseRedirect(f'/test_set/{test_set_id}')
     else:
         form = CreateQuestionForm()
         form_choice = CreateChoiceForm()
@@ -129,3 +165,19 @@ def create_question(request, test_set_id):
 
 def start_test_set(request, test_set_id):
     pass
+
+
+def register(request):
+    if request.method == 'POST':
+        user_form = UserRegistrationForm(request.POST)
+        if user_form.is_valid():
+            # Create a new user object but avoid saving it yet
+            new_user = user_form.save(commit=False)
+            # Set the chosen password
+            new_user.set_password(user_form.cleaned_data['password'])
+            # Save the User object
+            new_user.save()
+            return render(request, 'registration/register_done.html', {'new_user': new_user})
+    else:
+        user_form = UserRegistrationForm()
+    return render(request, 'registration/register.html', {'user_form': user_form})
