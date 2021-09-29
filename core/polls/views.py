@@ -1,7 +1,7 @@
 from .serializers import QuestionSerializer
 from .models import Question, TestSet, Answer, Choice
 from rest_framework import viewsets
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404, redirect
 # from .forms import AnswerFormSet
 from .forms import CreateTestSetForm, CreateQuestionForm, CreateChoiceForm, UserRegistrationForm
@@ -163,8 +163,48 @@ def create_question(request, test_set_id):
 
 
 
-def start_test_set(request, test_set_id):
-    pass
+def start_test_set(request, test_set_id, question_index=None):
+    if request.method == 'POST':
+        pass
+    else:
+        if question_index:
+            current_test_set = TestSet.objects.get(pk=test_set_id)
+            questions = current_test_set.question.all()
+            questions_id = [question.pk for question in questions].sort()
+            if not question_index in questions_id:
+                return HttpResponseNotFound('<h1>Question not found</h1>')
+            user = request.user.get_profile()
+            this_question = Question.objects.get(pk=question_index)
+            answers_this_user = Answer.objects.filter(user=user, question=this_question, test_set=current_test_set).all()
+            if answers_this_user:
+                return HttpResponseNotFound('<h1>Question has answer</h1>')
+            if question_index in range(questions_id):
+                if question_index != 0:
+                    late_question = Question.objects.get(pk=questions_id[question_index - 1])
+                    answers_late_question = Answer.objects.filter(user=user, question=late_question,
+                                                              test_set=current_test_set).all()
+                    if answers_late_question:
+                        next_question = Question.objects.get(pk=question_index)
+                        context = {
+                            'poll': next_question,
+                            'answers': Choice.objects.filter(question=next_question).all()
+                        }
+
+                        return render(request, 'polls/vote.html', context)
+
+        else:
+            current_test_set = TestSet.objects.get(pk=test_set_id)
+            questions = current_test_set.question.all()
+            questions_id = [question.pk for question in questions].sort()
+            first_question = Question.objects.get(pk=questions_id[0])
+            context = {
+                'poll': first_question,
+                'answers': Choice.objects.filter(question=first_question).all()
+            }
+
+            return render(request, 'polls/vote.html', context)
+
+
 
 
 def register(request):

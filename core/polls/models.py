@@ -40,5 +40,6 @@ class PassedTestSet(models.Model):
 
 class Answer(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
-    question = models.ForeignKey(PassedTestSet, on_delete=models.DO_NOTHING)
+    test_set = models.ForeignKey(TestSet, on_delete=models.DO_NOTHING)
+    question = models.ForeignKey(Question, on_delete=models.DO_NOTHING)
     answer = models.ForeignKey(Choice, on_delete=models.DO_NOTHING)
