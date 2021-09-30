@@ -23,12 +23,13 @@
 
                         <form method="POST">
                             {% csrf_token %}
+                            <input type="hidden" name="qiestion_id" value="{{ poll.pk }}">
                             <div class="form-group">
                                 <div class="radio">
-                                    {% for answer in answers %}
+                                    {% for choice in choices %}
                                         <label>
-                                            <input type="radio" name="poll" value={{ answer.pk }}>
-                                            {{ answer.title }}
+                                            <input type="checkbox" name="choice_{{ choice.pk }}" value={{ choice.pk }}>
+                                            {{ choice.choice }}
                                         </label> &nbsp;
                                     {% endfor %}
                                 </div>

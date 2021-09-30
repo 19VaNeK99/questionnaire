@@ -165,12 +165,36 @@ def create_question(request, test_set_id):
 
 def start_test_set(request, test_set_id, question_index=None):
     if request.method == 'POST':
-        pass
+        user = request.user.get_profile()
+        test_set = TestSet.objects.get(pk=test_set_id)
+        question_id = request.method['POST']['question_id']
+        question = Question.objects.get(pk=question_id)
+        for choice in request.method['POST'].keys():
+            if 'choice' in choice:
+                choice_id = int(request.method['POST'][choice][-1])
+                curr_choice = Choice.objects.get(pk=choice_id)
+                new_answer = Question.objects.create(user=user,
+                                                     test_set=test_set,
+                                                     question=question,
+                                                     answer=curr_choice)
+                new_answer.save()
+
+        current_test_set = TestSet.objects.get(pk=test_set_id)
+        questions = current_test_set.questions.all()
+        questions_id = sorted([question.pk for question in questions])
+
+        return HttpResponseRedirect(f'/test_set/{test_set_id}')
+
+
+
+
+
+
     else:
         if question_index:
             current_test_set = TestSet.objects.get(pk=test_set_id)
-            questions = current_test_set.question.all()
-            questions_id = [question.pk for question in questions].sort()
+            questions = current_test_set.questions.all()
+            questions_id = sorted([question.pk for question in questions])
             if not question_index in questions_id:
                 return HttpResponseNotFound('<h1>Question not found</h1>')
             user = request.user.get_profile()
@@ -194,12 +218,12 @@ def start_test_set(request, test_set_id, question_index=None):
 
         else:
             current_test_set = TestSet.objects.get(pk=test_set_id)
-            questions = current_test_set.question.all()
-            questions_id = [question.pk for question in questions].sort()
+            questions = current_test_set.questions.all()
+            questions_id = sorted([question.pk for question in questions])
             first_question = Question.objects.get(pk=questions_id[0])
             context = {
                 'poll': first_question,
-                'answers': Choice.objects.filter(question=first_question).all()
+                'choices': Choice.objects.filter(question=first_question).all()
             }
 
             return render(request, 'polls/vote.html', context)
