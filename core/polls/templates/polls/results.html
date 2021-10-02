@@ -1,4 +1,4 @@
-{% extends "poll/base.html" %}
+{% extends "polls/base.html" %}
 
 {% block title %}Results{% endblock %}
 
@@ -10,19 +10,37 @@
                 <h3 class="panel-title">Poll Result</h3>
             </div>
 
-            <div class="panel-body">
-                <h3>{{ poll.question }}</h3>
-            </div>
-
             <ul class="list-group">
-                <li class="list-group-item">{{ poll.option_one }} &mdash; <strong>{{ poll.option_one_count }}</strong></li>
-                <li class="list-group-item">{{ poll.option_two }} &mdash; <strong>{{ poll.option_two_count }}</strong></li>
-                <li class="list-group-item">{{ poll.option_three }} &mdash; <strong>{{ poll.option_three_count }}</strong></li>
-            </ul>
+                {% for question in results %}
+                <li class="list-group-item">
+                    <strong>{{ question.question_title }}</strong>
+                    <span class="pull-right">
+                        <div class="row">
+                        {% for choice in question.choices %}
+                            <div class="col-md-4">
+                                {% if choice.user_answer %}
+                                <div class="bg-info">
+                                    {% else %}
+                                    <div>
+                                        {% endif %}
 
-            <div class="panel-footer">
-                Total &mdash; <strong>{{ poll.total }}</strong>
-            </div>
+                                        {% if choice.is_right %}
+                                <div class="text-success">
+                                    {% else %}
+                                    <div class="text-danger">
+                                        {% endif %}
+                                    <p>{{ choice.title }}</p>
+                                    </div>
+                                </div>
+<!--                            <p class="text-right">{{ choice.is_right }}</p>-->
+<!--                            <p class="text-right">{{ choice.user_answer }}</p>-->
+                            </div>
+                        {% endfor %}
+                        </div>
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
 
         </div>
     </div>

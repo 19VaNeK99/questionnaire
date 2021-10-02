@@ -1,7 +1,7 @@
 from .serializers import QuestionSerializer
 from .models import Question, TestSet, Answer, Choice
 from rest_framework import viewsets
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 # from .forms import AnswerFormSet
 from .forms import CreateTestSetForm, CreateQuestionForm, CreateChoiceForm, UserRegistrationForm
@@ -56,13 +56,7 @@ def create_test_set(request):
     return render(request, 'polls/create.html', context)
 
 
-def results(request, poll_id):
-    poll = Answer.objects.get(pk=poll_id)
 
-    context = {
-        'poll': poll
-    }
-    return render(request, 'polls/results.html', context)
 
 
 def vote(request, question_id):
@@ -165,30 +159,30 @@ def create_question(request, test_set_id):
 
 def start_test_set(request, test_set_id, question_index=None):
     if request.method == 'POST':
-        user = request.user.get_profile()
+        user = request.user
+        if user.is_anonymous:
+            return HttpResponseRedirect(f'/accounts/login')
+
         test_set = TestSet.objects.get(pk=test_set_id)
-        question_id = request.method['POST']['question_id']
+        question_id = request.POST['question_id']
         question = Question.objects.get(pk=question_id)
-        for choice in request.method['POST'].keys():
+        for choice in request.POST.keys():
             if 'choice' in choice:
-                choice_id = int(request.method['POST'][choice][-1])
+                choice_id = int(request.POST[choice][-1])
                 curr_choice = Choice.objects.get(pk=choice_id)
-                new_answer = Question.objects.create(user=user,
+                new_answer = Answer.objects.create(user=user,
                                                      test_set=test_set,
                                                      question=question,
-                                                     answer=curr_choice)
+                                                     choice=curr_choice)
                 new_answer.save()
 
         current_test_set = TestSet.objects.get(pk=test_set_id)
         questions = current_test_set.questions.all()
-        questions_id = sorted([question.pk for question in questions])
-
-        return HttpResponseRedirect(f'/test_set/{test_set_id}')
-
-
-
-
-
+        if len(questions) > 1:
+            next_question_index = sorted([question.pk for question in questions]).index(question_id) + 1
+            return HttpResponseRedirect(f'/start_test_set/{test_set_id}/{next_question_index}')
+        else:
+            return HttpResponseRedirect(f'/results/{test_set_id}')
 
     else:
         if question_index:
@@ -245,3 +239,43 @@ def register(request):
     else:
         user_form = UserRegistrationForm()
     return render(request, 'registration/register.html', {'user_form': user_form})
+
+
+def results(request, test_set_id):
+    curr_test_set = TestSet.objects.get(pk=test_set_id)
+    # from django.contrib.auth.models import User
+    curr_user = request.user
+    test_sets_questions = Question.objects.filter(test_set=curr_test_set)
+    answers = Answer.objects.filter(test_set=test_set_id,
+                                 user=curr_user).all()
+    # questions = Question.objects.filter(test_set=curr_test_set).all()
+    result = []
+    for test_sets_question in test_sets_questions:
+        item = {}
+        item['question_title'] = test_sets_question.title
+        choices_question = Choice.objects.filter(question=test_sets_question).all()
+        choices = []
+        for choice in choices_question:
+            choice_item = {}
+            choice_item['title'] = choice.choice
+            choice_item['is_right'] = choice.is_right
+            user_answer = Answer.objects.filter(
+                test_set=test_set_id,
+                user=curr_user,
+                choice=choice
+            )
+            choice_item['user_answer'] = bool(user_answer)
+            choices.append(choice_item)
+        item['choices'] = choices
+
+        result.append(item)
+    # return JsonResponse(result, safe=False)
+
+
+
+
+
+    context = {
+        'results': result
+    }
+    return render(request, 'polls/results.html', context)

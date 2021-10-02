@@ -23,7 +23,7 @@
 
                         <form method="POST">
                             {% csrf_token %}
-                            <input type="hidden" name="qiestion_id" value="{{ poll.pk }}">
+                            <input type="hidden" name="question_id" value="{{ poll.pk }}">
                             <div class="form-group">
                                 <div class="radio">
                                     {% for choice in choices %}

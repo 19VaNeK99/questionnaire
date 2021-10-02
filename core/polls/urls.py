@@ -18,7 +18,7 @@ urlpatterns = [
     #path('create_question/<test_set_id>/', views.CreateQuestion.as_view(test_set_id='test_set_id'), name='create_question'),
     path('start_test_set/<test_set_id>/', views.start_test_set, name='start_test_set'),
     path('start_test_set/<test_set_id>/<question_index>/', views.start_test_set, name='start_test_set'),
-    path('results/<poll_id>/', views.results, name='results'),
+    path('results/<test_set_id>/', views.results, name='results'),
     path('vote/<question_id>/', views.vote, name='vote'),
     path('test_set/<test_set_id>/', views.test_set, name='test_set')
 ]
