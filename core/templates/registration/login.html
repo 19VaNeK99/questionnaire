@@ -1,5 +1,8 @@
+{% extends "polls/base.html" %}
 
-<h2>Log In</h2>
+{% block title %}Log In{% endblock %}
+<!--<h2>Log In</h2>-->
+{% block main %}
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
@@ -7,3 +10,5 @@
 
 </form>
 <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+<p><a href="{% url 'register' %}">Don't have account?</a></p>
+{% endblock %}

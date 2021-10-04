@@ -1,2 +1,7 @@
-<h1>Welcome {{ new_user.first_name }}!</h1>
+{% extends "polls/base.html" %}
+
+{% block title %}Welcome {{ new_user.first_name }}!{% endblock %}
+<!--<h2>Log In</h2>-->
+{% block main %}
 <p>Your account has been successfully created. Now you can <a href="{% url 'login' %}">log in</a>.</p>
+{% endblock %}

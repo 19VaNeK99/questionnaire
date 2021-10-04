@@ -34,9 +34,20 @@
                 <div class="collapse navbar-collapse navbar-ex1-collapse">
                     <ul class="nav navbar-nav">
                         <li><a href="{% url 'home' %}">Home</a></li>
-                        <li><a href="{% url 'create_test_set' %}">Create</a></li>
+                        {% if user.is_superuser %}
+                            <li><a href="{% url 'create_test_set' %}">Create</a></li>
+                        {% endif %}
+                        {% if user.is_authenticated %}
+                            <li><a>Hello, {{ user.username }}</a></li>
+                            <li><a href="{% url 'logout' %}">Logout</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">Login</a></li>
+                        {% endif %}
                     </ul>
                 </div><!-- /.navbar-collapse -->
+
+
+
             </div>
         </nav>
 

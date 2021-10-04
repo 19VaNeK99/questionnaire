@@ -5,7 +5,7 @@ from django.db import models
 class TestSet(models.Model):
     title = models.CharField(max_length=200)
     visible = models.BooleanField(default=False)
-    questions = models.ManyToManyField('Question', blank=True)
+    # questions = models.ManyToManyField('Question', blank=True)
 
     def __str__(self):
         return self.title
@@ -13,7 +13,7 @@ class TestSet(models.Model):
 
 class Question(models.Model):
     title = models.CharField(max_length=4096)
-    test_set = models.ManyToManyField('TestSet', through=TestSet.questions.through, blank=True)
+    test_set = models.ForeignKey(TestSet, on_delete=models.CASCADE)
     # testset = models.ManyToManyField(TestSet)
 
     def __str__(self):
@@ -21,7 +21,7 @@ class Question(models.Model):
 
 
 class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.DO_NOTHING)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice = models.CharField(max_length=4096)
     is_right = models.BooleanField(default=False)
 
@@ -30,8 +30,8 @@ class Choice(models.Model):
 
 
 class PassedTestSet(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
-    testset = models.ForeignKey(TestSet, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    testset = models.ForeignKey(TestSet, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -39,7 +39,7 @@ class PassedTestSet(models.Model):
 
 
 class Answer(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
-    test_set = models.ForeignKey(TestSet, on_delete=models.DO_NOTHING)
-    question = models.ForeignKey(Question, on_delete=models.DO_NOTHING)
-    choice = models.ForeignKey(Choice, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    test_set = models.ForeignKey(TestSet, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
