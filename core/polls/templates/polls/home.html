@@ -15,7 +15,8 @@
                 <li class="list-group-item">
                     <strong>{{ testset.title }}</strong>
                     <span class="pull-right">
-                        <a href="{% url 'test_set' testset.id %}" class="btn btn-info btn-xs">Vote</a> &nbsp;
+                        <a href="{% url 'test_set' testset.id %}" class="btn btn-info btn-xs">Select</a> &nbsp;
+                        <a href="{% url 'delete_test_set' testset.id %}" class="btn btn-info btn-xs">Delete</a> &nbsp;
                     </span>
                 </li>
                 {% endfor %}

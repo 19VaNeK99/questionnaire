@@ -20,5 +20,6 @@ urlpatterns = [
     path('start_test_set/<test_set_id>/<question_index>/', views.start_test_set, name='start_test_set'),
     path('results/<test_set_id>/', views.results, name='results'),
     path('vote/<question_id>/', views.vote, name='vote'),
-    path('test_set/<test_set_id>/', views.test_set, name='test_set')
+    path('test_set/<test_set_id>/', views.test_set, name='test_set'),
+    path('delete_test_set/<test_set_id>/', views.delete_test_set, name='delete_test_set')
 ]

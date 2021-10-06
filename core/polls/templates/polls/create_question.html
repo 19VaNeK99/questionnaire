@@ -9,7 +9,6 @@
     function add_fields() {
         var d = document.getElementById("content");
         count_choice += 1;
-<!--        d.innerHTML += '<br/><div class="col-lg-4"><div class="form-group"><label for="option' + count_choice + '">Option ' + count_choice + '</label> {% render_field form_choice.choice class="form-control" %} </div></div>'-->
         d.innerHTML += '<input type="text" required name="choice' + count_choice + '">input' + count_choice + '</p><input type="radio" name="is_right' + count_choice + '" value="1">Верно?</p>'
     }
 </script>
@@ -37,8 +36,6 @@
                             <div class="form-group">
                                 <label for="question">Enter Poll Question</label>
                                 {% render_field form.title class="form-control" rows="3" %}
-<!--                                {{ form }}-->
-<!--                                <input type="text" name="f1">input1</p>-->
 
                             </div>
                         </div>
@@ -47,14 +44,7 @@
 
                     <input type="button" id="more_fields" onclick="add_fields();" value="Add More" />
                     <div class="row" id="content">
-<!--                        <div id="room_fileds">-->
-<!--                            <div class="col-lg-4">-->
-<!--                                <div class="form-group">-->
-<!--                                    <label for="option1">Option 1</label>-->
-<!--                                    {% render_field form_choice.choice class="form-control" %}-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
+
                     </div>
 
                     <div class="row">
