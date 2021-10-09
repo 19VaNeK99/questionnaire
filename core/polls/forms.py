@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import TestSet, Question, Choice
+from .models import TestSet, Question
 from django.contrib.auth.models import User
 
 
@@ -14,12 +14,6 @@ class CreateQuestionForm(forms.ModelForm):
     class Meta:
         model = Question
         fields = ['title']
-
-
-class CreateChoiceForm(forms.ModelForm):
-    class Meta:
-        model = Choice
-        fields = ['choice', 'is_right']
 
 
 class UserRegistrationForm(forms.ModelForm):

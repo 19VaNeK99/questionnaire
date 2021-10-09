@@ -5,11 +5,11 @@
 
 {% block head %}
 <script>
-    let count_choice = 1;
+    let count_choice = 0;
     function add_fields() {
         var d = document.getElementById("content");
         count_choice += 1;
-        d.innerHTML += '<input type="text" required name="choice' + count_choice + '">input' + count_choice + '</p><input type="radio" name="is_right' + count_choice + '" value="1">Верно?</p>'
+        d.innerHTML += '<p>input' + count_choice + '</p><input type="text" required name="choice' + count_choice + '"><input type="radio" name="is_right' + count_choice + '" value="1">Верно?</p>'
     }
 </script>
 {% endblock %}
@@ -43,6 +43,8 @@
 
 
                     <input type="button" id="more_fields" onclick="add_fields();" value="Add More" />
+                    <br>
+                    <br>
                     <div class="row" id="content">
 
                     </div>

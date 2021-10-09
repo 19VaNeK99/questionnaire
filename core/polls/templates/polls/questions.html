@@ -1,0 +1,27 @@
+{% extends "polls/base.html" %}
+
+{% block title %}List Questions{% endblock %}
+
+{% block main %}
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-2">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Test Sets</h3>
+            </div>
+                
+            <ul class="list-group">
+                {% for question in questions %}
+                <li class="list-group-item">
+                    <strong>{{ question.title }}</strong>
+                    <span class="pull-right">
+                        <a href="{% url 'delete_question' test_set_id question.id %}" class="btn btn-info btn-xs">Delete</a> &nbsp;
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

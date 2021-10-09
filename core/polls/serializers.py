@@ -7,4 +7,3 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Question
         fields = ['pk', 'title', 'max_points', ]
-

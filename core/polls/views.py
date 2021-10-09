@@ -1,11 +1,9 @@
 from .serializers import QuestionSerializer
 from .models import Question, TestSet, Answer, Choice, PassedTestSet
 from rest_framework import viewsets
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, JsonResponse
-from django.shortcuts import render, get_object_or_404, redirect
-# from .forms import AnswerFormSet
-from .forms import CreateTestSetForm, CreateQuestionForm, CreateChoiceForm, UserRegistrationForm
-from django.views.generic import View
+from django.http import HttpResponseRedirect, HttpResponseNotFound
+from django.shortcuts import render, redirect
+from .forms import CreateTestSetForm, CreateQuestionForm, UserRegistrationForm
 
 
 class GetQuestion(viewsets.ModelViewSet):
@@ -13,6 +11,16 @@ class GetQuestion(viewsets.ModelViewSet):
     queryset = Question.objects.all()
 
 
+def is_anonymous(view_func):
+    def decorator(request, *args, **kwargs):
+        if request.user.is_anonymous:
+            return HttpResponseRedirect(f'/accounts/login')
+        return view_func(request, *args, **kwargs)
+
+    return decorator
+
+
+@is_anonymous
 def home(request):
     test_sets = list(TestSet.objects.all())
     user = request.user
@@ -26,7 +34,6 @@ def home(request):
                 del test_sets[i]
                 i -= 1
             i += 1
-
     context = {
         'testsets': test_sets,
         'user': request.user
@@ -34,6 +41,37 @@ def home(request):
     return render(request, 'polls/home.html', context)
 
 
+@is_anonymous
+def list_questions(request, test_set_id):
+    try:
+        test_set = TestSet.objects.filter(pk=test_set_id)[0]
+    except IndexError:
+        return HttpResponseNotFound('<h1>Test Set not found</h1>')
+
+    questions = Question.objects.filter(test_set=test_set).all()
+    user = request.user
+    if not user.is_superuser:
+        return HttpResponseNotFound('<h1>Url not found</h1>')
+
+    context = {
+        'test_set_id': test_set_id,
+        'questions': questions,
+        'user': request.user
+    }
+    return render(request, 'polls/questions.html', context)
+
+
+@is_anonymous
+def delete_question(request, test_set_id, question_id):
+    user = request.user
+    if user.is_superuser:
+        Question.objects.filter(pk=question_id).delete()
+        return HttpResponseRedirect(f'/list_questions/{test_set_id}')
+    else:
+        return HttpResponseNotFound('<h1>Url not found</h1>')
+
+
+@is_anonymous
 def delete_test_set(request, test_set_id):
     user = request.user
     if user.is_superuser:
@@ -43,6 +81,7 @@ def delete_test_set(request, test_set_id):
         return HttpResponseNotFound('<h1>Url not found</h1>')
 
 
+@is_anonymous
 def create_test_set(request):
     if request.method == 'POST':
         form = CreateTestSetForm(request.POST)
@@ -61,35 +100,8 @@ def create_test_set(request):
     return render(request, 'polls/create.html', context)
 
 
-# def vote(request, question_id):
-#     poll = Question.objects.get(pk=question_id)
-#     if request.method == 'POST':
-#
-#         selected_option = request.POST['poll']
-#         print(selected_option)
-#         current_answer = Answer
-#         return HttpResponse(400, 'Invalid form option')
-#
-#
-#         poll.save()
-#
-#         return redirect('results', poll.id)
-#
-#     else:
-#         form = AnswerPollForm()
-#
-#     context = {
-#         'poll': poll,
-#         'answers': Choice.objects.filter(question=poll).all()
-#     }
-#     # context = {
-#     #     'form': form
-#     # }
-#     return render(request, 'polls/vote.html', context)
-
-
+@is_anonymous
 def test_set(request, test_set_id):
-
     current_test_set = TestSet.objects.get(pk=test_set_id)
     this_questions = Question.objects.filter(test_set=current_test_set).all()
 
@@ -122,12 +134,18 @@ def form_create_question_is_valid(request):
         return False
 
 
+@is_anonymous
 def create_question(request, test_set_id, text=''):
-
+    if not request.user.is_superuser:
+        return HttpResponseNotFound('<h1>Url not found</h1>')
     if request.method == 'POST':
-        if form_create_question_is_valid(request):
 
-            current_test_set = TestSet.objects.get(pk=test_set_id)
+        if form_create_question_is_valid(request):
+            try:
+                current_test_set = TestSet.objects.filter(pk=test_set_id)[0]
+            except IndexError:
+                return HttpResponseNotFound('<h1>Test Set not found</h1>')
+
             new_question = Question.objects.create(title=request.POST['title'],
                                                    test_set=current_test_set)
             new_question.save()
@@ -163,21 +181,21 @@ def create_question(request, test_set_id, text=''):
         return render(request, 'polls/create_question.html', context)
 
 
+@is_anonymous
 def start_test_set(request, test_set_id, question_index=None):
     user = request.user
     try:
         current_test_set = TestSet.objects.filter(pk=test_set_id)[0]
     except IndexError:
         return HttpResponseNotFound('<h1>Test Set not found</h1>')
+    questions = Question.objects.filter(test_set=current_test_set).all()
     last_test_set_answer = PassedTestSet.objects.filter(user=user, testset=current_test_set).all()
     if last_test_set_answer:
         return HttpResponseNotFound('<h1>Test Set has answer</h1>')
     if request.method == 'POST':
-        user = request.user
         if user.is_anonymous:
             return HttpResponseRedirect(f'/accounts/login')
 
-        test_set = TestSet.objects.get(pk=test_set_id)
         question_id = request.POST['question_id']
         question = Question.objects.get(pk=question_id)
         has_answer = False
@@ -187,7 +205,7 @@ def start_test_set(request, test_set_id, question_index=None):
                 choice_id = int(request.POST[choice].split('_')[-1])
                 curr_choice = Choice.objects.get(pk=choice_id)
                 new_answer = Answer.objects.create(user=user,
-                                                   test_set=test_set,
+                                                   test_set=current_test_set,
                                                    question=question,
                                                    choice=curr_choice)
                 new_answer.save()
@@ -196,13 +214,8 @@ def start_test_set(request, test_set_id, question_index=None):
                 return HttpResponseRedirect(f'/start_test_set/{test_set_id}/{question_index}')
             else:
                 return HttpResponseRedirect(f'/start_test_set/{test_set_id}')
-        current_test_set = TestSet.objects.get(pk=test_set_id)
-        questions = Question.objects.filter(test_set=current_test_set).all()
         if len(questions) > 1:
-            qq = [question.pk for question in questions]
-            ss = sorted(qq)
-            iinn = ss.index(int(question_id))
-            next_question_index = iinn + 1
+            next_question_index = sorted([question.pk for question in questions]).index(int(question_id)) + 1
             if next_question_index < len(questions):
                 return HttpResponseRedirect(f'/start_test_set/{test_set_id}/{next_question_index}')
             else:
@@ -220,12 +233,9 @@ def start_test_set(request, test_set_id, question_index=None):
 
     else:
         if question_index:
-            current_test_set = TestSet.objects.get(pk=test_set_id)
-            questions = Question.objects.filter(test_set=current_test_set).all()
             questions_id = sorted([question.pk for question in questions])
             if not int(question_index) in range(len(questions_id)):
                 return HttpResponseNotFound('<h1>Question not found</h1>')
-            user = request.user
             qq_pk = questions_id[int(question_index)]
             this_question = Question.objects.get(pk=qq_pk)
             answers_this_user = Answer.objects.filter(user=user, question=this_question,
@@ -248,8 +258,6 @@ def start_test_set(request, test_set_id, question_index=None):
                     return render(request, 'polls/vote.html', context)
 
         else:
-            current_test_set = TestSet.objects.get(pk=test_set_id)
-            questions = Question.objects.filter(test_set=current_test_set).all()
             questions_id = sorted([question.pk for question in questions])
             last_question_id = None
             for q_id in questions_id:
@@ -260,7 +268,7 @@ def start_test_set(request, test_set_id, question_index=None):
                 else:
                     last_question_id = q_id
                     break
-            if last_question_id != None:
+            if last_question_id is not None:
                 first_question = Question.objects.get(pk=last_question_id)
             else:
                 new_passed_test_set = PassedTestSet.objects.create(user=user,
@@ -284,23 +292,20 @@ def register(request):
             return HttpResponseRedirect(f'/home')
         user_form = UserRegistrationForm(request.POST)
         if user_form.is_valid():
-            # Create a new user object but avoid saving it yet
             new_user = user_form.save(commit=False)
-            # Set the chosen password
             new_user.set_password(user_form.cleaned_data['password'])
-            # Save the User object
             new_user.save()
             return render(request, 'registration/register_done.html', {'new_user': new_user})
     else:
         if not user.is_anonymous:
             return HttpResponseRedirect(f'/home')
         user_form = UserRegistrationForm()
-    return render(request, 'registration/register.html', {'user_form': user_form})
+        return render(request, 'registration/register.html', {'user_form': user_form})
 
 
-def solve_total_result(results):
+def solve_total_result(total_result):
     total = 0
-    for result in results:
+    for result in total_result:
         count_right = 0
         count_answer = 0
         it_is_zero = False
@@ -313,12 +318,16 @@ def solve_total_result(results):
         if not it_is_zero:
             total += count_answer / count_right
     if total > 0:
-        total = (total / len(results)) * 100
+        total = (total / len(total_result)) * 100
     return total
 
 
+@is_anonymous
 def results(request, test_set_id):
-    curr_test_set = TestSet.objects.get(pk=test_set_id)
+    try:
+        curr_test_set = TestSet.objects.filter(pk=test_set_id)[0]
+    except IndexError:
+        return HttpResponseNotFound('<h1>Test Set not found</h1>')
     curr_passed_test_set = PassedTestSet.objects.filter(user=request.user,
                                                         testset=curr_test_set)
     if not curr_passed_test_set:
@@ -326,16 +335,14 @@ def results(request, test_set_id):
 
     curr_user = request.user
     test_sets_questions = Question.objects.filter(test_set=curr_test_set)
-    answers = Answer.objects.filter(test_set=test_set_id,
-                                    user=curr_user).all()
     result = []
     for test_sets_question in test_sets_questions:
-        item = {}
+        item = dict()
         item['question_title'] = test_sets_question.title
         choices_question = Choice.objects.filter(question=test_sets_question).all()
         choices = []
         for choice in choices_question:
-            choice_item = {}
+            choice_item = dict()
             choice_item['title'] = choice.choice
             choice_item['is_right'] = choice.is_right
             user_answer = Answer.objects.filter(
@@ -353,7 +360,7 @@ def results(request, test_set_id):
 
     context = {
         'results': result,
-        'user': request.user,
+        'user': curr_user,
         'total': total
     }
     return render(request, 'polls/results.html', context)

@@ -16,7 +16,10 @@
                     <strong>{{ testset.title }}</strong>
                     <span class="pull-right">
                         <a href="{% url 'test_set' testset.id %}" class="btn btn-info btn-xs">Select</a> &nbsp;
-                        <a href="{% url 'delete_test_set' testset.id %}" class="btn btn-info btn-xs">Delete</a> &nbsp;
+                        {% if user.is_superuser %}
+                            <a href="{% url 'delete_test_set' testset.id %}" class="btn btn-info btn-xs">Delete</a> &nbsp;
+                            <a href="{% url 'list_questions' testset.id %}" class="btn btn-info btn-xs">List Questions</a> &nbsp;
+                        {% endif %}
                     </span>
                 </li>
                 {% endfor %}

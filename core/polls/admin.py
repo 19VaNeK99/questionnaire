@@ -6,4 +6,3 @@ admin.site.register(Question)
 admin.site.register(TestSet)
 admin.site.register(Choice)
 admin.site.register(PassedTestSet)
-
