@@ -177,7 +177,6 @@ def create_question(request, test_set_id, text=''):
 
 @is_anonymous
 def start_test_set(request, test_set_id, question_index=None):
-
     return StartTestSet(request, test_set_id, question_index).get()
 
 
