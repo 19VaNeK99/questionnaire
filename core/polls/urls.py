@@ -1,15 +1,10 @@
-from django.urls import path, include
+from django.urls import path
 
-from rest_framework import routers
 from . import views
 
-router = routers.DefaultRouter()
-router.register(r'polls', views.GetQuestion)
-
 urlpatterns = [
-    path('', include(router.urls)),
     path(r'accounts/register/', views.register, name='register'),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('', views.home, name='home'),
     path('home', views.home, name='home'),
     path('create_test_set/', views.create_test_set, name='create_test_set'),
     path('create_question/<test_set_id>/', views.create_question, name='create_question'),

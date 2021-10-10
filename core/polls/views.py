@@ -1,14 +1,7 @@
-from .serializers import QuestionSerializer
 from .models import Question, TestSet, Answer, Choice, PassedTestSet
-from rest_framework import viewsets
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from .forms import CreateTestSetForm, CreateQuestionForm, UserRegistrationForm
-
-
-class GetQuestion(viewsets.ModelViewSet):
-    serializer_class = QuestionSerializer
-    queryset = Question.objects.all()
 
 
 def is_anonymous(view_func):

@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  web:
+    build: .
+    environment:
+      SECRET_KEY: django-insecure-07b=rjue5^-c@74#6bdq6*v3k=dn^stio3_7nb9r%uzft0j2@%
+    command: >
+      bash -c "python manage.py makemigrations polls
+      && python manage.py migrate
+      && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/core
+    ports:
+      - "8000:8000"
+
