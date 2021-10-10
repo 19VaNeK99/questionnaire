@@ -1,3 +1,4 @@
+from .start_test_set_module import StartTestSet
 from .models import Question, TestSet, Answer, Choice, PassedTestSet
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render, redirect
@@ -176,106 +177,9 @@ def create_question(request, test_set_id, text=''):
 
 @is_anonymous
 def start_test_set(request, test_set_id, question_index=None):
-    user = request.user
-    try:
-        current_test_set = TestSet.objects.filter(pk=test_set_id)[0]
-    except IndexError:
-        return HttpResponseNotFound('<h1>Test Set not found</h1>')
-    questions = Question.objects.filter(test_set=current_test_set).all()
-    last_test_set_answer = PassedTestSet.objects.filter(user=user, testset=current_test_set).all()
-    if last_test_set_answer:
-        return HttpResponseNotFound('<h1>Test Set has answer</h1>')
-    if request.method == 'POST':
-        if user.is_anonymous:
-            return HttpResponseRedirect(f'/accounts/login')
 
-        question_id = request.POST['question_id']
-        question = Question.objects.get(pk=question_id)
-        has_answer = False
-        for choice in request.POST.keys():
-            if 'choice' in choice:
-                has_answer = True
-                choice_id = int(request.POST[choice].split('_')[-1])
-                curr_choice = Choice.objects.get(pk=choice_id)
-                new_answer = Answer.objects.create(user=user,
-                                                   test_set=current_test_set,
-                                                   question=question,
-                                                   choice=curr_choice)
-                new_answer.save()
-        if not has_answer:
-            if question_index:
-                return HttpResponseRedirect(f'/start_test_set/{test_set_id}/{question_index}')
-            else:
-                return HttpResponseRedirect(f'/start_test_set/{test_set_id}')
-        if len(questions) > 1:
-            next_question_index = sorted([question.pk for question in questions]).index(int(question_id)) + 1
-            if next_question_index < len(questions):
-                return HttpResponseRedirect(f'/start_test_set/{test_set_id}/{next_question_index}')
-            else:
-                new_passed_test_set = PassedTestSet.objects.create(user=user,
-                                                                   testset=current_test_set
-                                                                   )
-                new_passed_test_set.save()
-                return HttpResponseRedirect(f'/results/{test_set_id}')
-        else:
-            new_passed_test_set = PassedTestSet.objects.create(user=user,
-                                                               testset=current_test_set
-                                                               )
-            new_passed_test_set.save()
-            return HttpResponseRedirect(f'/results/{test_set_id}')
+    return StartTestSet(request, test_set_id, question_index).get()
 
-    else:
-        if question_index:
-            questions_id = sorted([question.pk for question in questions])
-            if not int(question_index) in range(len(questions_id)):
-                return HttpResponseNotFound('<h1>Question not found</h1>')
-            qq_pk = questions_id[int(question_index)]
-            this_question = Question.objects.get(pk=qq_pk)
-            answers_this_user = Answer.objects.filter(user=user, question=this_question,
-                                                      test_set=current_test_set).all()
-            if answers_this_user:
-                return HttpResponseNotFound('<h1>Question has answer</h1>')
-
-            if question_index != 0:
-                late_question = Question.objects.get(pk=questions_id[int(question_index) - 1])
-                answers_late_question = Answer.objects.filter(user=user, question=late_question,
-                                                              test_set=current_test_set).all()
-                if answers_late_question:
-                    next_question = Question.objects.get(pk=questions_id[int(question_index)])
-                    context = {
-                        'poll': next_question,
-                        'choices': Choice.objects.filter(question=next_question).all(),
-                        'user': request.user
-                    }
-
-                    return render(request, 'polls/vote.html', context)
-
-        else:
-            questions_id = sorted([question.pk for question in questions])
-            last_question_id = None
-            for q_id in questions_id:
-                if Answer.objects.filter(user=user,
-                                         test_set=current_test_set,
-                                         question=q_id):
-                    continue
-                else:
-                    last_question_id = q_id
-                    break
-            if last_question_id is not None:
-                first_question = Question.objects.get(pk=last_question_id)
-            else:
-                new_passed_test_set = PassedTestSet.objects.create(user=user,
-                                                                   testset=current_test_set
-                                                                   )
-                new_passed_test_set.save()
-                return HttpResponseRedirect(f'/results/{test_set_id}')
-            context = {
-                'poll': first_question,
-                'choices': Choice.objects.filter(question=first_question).all(),
-                'user': request.user
-            }
-
-            return render(request, 'polls/vote.html', context)
 
 
 def register(request):
