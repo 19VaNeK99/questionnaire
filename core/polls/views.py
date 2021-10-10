@@ -180,7 +180,6 @@ def start_test_set(request, test_set_id, question_index=None):
     return StartTestSet(request, test_set_id, question_index).get()
 
 
-
 def register(request):
     user = request.user
     if request.method == 'POST':
