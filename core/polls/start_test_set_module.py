@@ -83,7 +83,7 @@ class StartTestSet:
         answers_this_user = Answer.objects.filter(user=self.user, question=this_question,
                                                   test_set=self.test_set).all()
         if answers_this_user:
-            self.result = HttpResponseNotFound('<h1>Question has answer</h1>')
+            self.result = HttpResponseRedirect(f'/start_test_set/{self.test_set_id}/{int(self.question_index) + 1}')
             raise QuestionError
 
     def http_get(self):
@@ -104,6 +104,9 @@ class StartTestSet:
                 }
 
                 return render(self.request, 'polls/vote.html', context)
+            else:
+                return HttpResponseRedirect(f'/start_test_set/{self.test_set_id}/{int(self.question_index) - 1}')
+
 
         else:
 
@@ -143,8 +146,9 @@ class StartTestSet:
                 return self.http_get()
         except (TestSetError, RedirectError, QuestionError):
             return self.result
-        except Exception:
-            return Resolver404
+        except Exception as e:
+            print(e)
+            return Resolver404("Error 404")
 
 
 class TestSetError(Exception):
